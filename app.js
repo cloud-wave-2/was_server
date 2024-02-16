@@ -1,30 +1,29 @@
+const HOST = process.env.HOST;
+const USER = process.env.USER;
+const PASSWD = process.env.PASSWD;
+const DATABASE = process.env.DATABASE;
+const Port = process.env.PORT;
+
 const express = require('express');
 const mysql = require('mysql');
+
 
 const app = express();
 const PORT = 4000;
 app.use(express.json());
 
 const rdsConfig = {
-    host: 'dev-ecommerce-database-01.cjyuicqq0675.ap-northeast-2.rds.amazonaws.com',
-    user: 'admin',
-    password: 'qwer1234',
-    database: 'olive_young',
-    port: 3306 // Default MySQL port
+    host: HOST,
+    user: USER,
+    password: PASSWD,
+    database: DATABASE,
+    port: Port // Default MySQL port
 };
 const connection = mysql.createConnection(rdsConfig);
 connection.connect(err => {
     if (err) {
         console.error('Error connecting to MySQL: ' + err.stack);
     }
-    // connection.query('insert into product (name, price, user_id) values (\'what\', 10, \'cloud\')', (error, results, fields) => {
-    //     if (error) {
-    //         return res.status(500).send('Error in database operation');
-    //     }
-    //     else {
-    //         console.log(results);
-    //     }
-    // });
     console.log('Connected to MySQL as ID ' + connection.threadId);
 });
 app.post('/purchase', (req, res) => {
@@ -40,5 +39,5 @@ app.post('/purchase', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`WAS running on http://localhost:${PORT}`);
+    console.log(`WAS running on ${PORT} port`);
 });
