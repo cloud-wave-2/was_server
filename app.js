@@ -19,24 +19,66 @@ const rdsConfig = {
     database: DATABASE,
     port: Port // Default MySQL port
 };
+
+const HOST2 = process.env.HOST2;
+const USER2 = process.env.USER2;
+const PASSWD2 = process.env.PASSWD2;
+const DATABASE2 = process.env.DATABASE2;
+const Port2 = process.env.PORT2;
+
 const connection = mysql.createConnection(rdsConfig);
+
+const rdsConfigRO = {
+    host: HOST2,
+    user: USER2,
+    password: PASSWD2,
+    database: DATABASE2,
+    port: Port2 // Default MySQL port
+};
+const connectionRO = mysql.createConnection(rdsConfigRO);
+
 connection.connect(err => {
     if (err) {
         console.error('Error connecting to MySQL: ' + err.stack);
     }
     console.log('Connected to MySQL as ID ' + connection.threadId);
 });
+
+connectionRO.connect(err => {
+    if (err) {
+        console.error('Error connecting to MySQL: ' + err.stack);
+    }
+    console.log('Connected to MySQL as ID ' + connectionRO.threadId);
+});
+
 app.post('/purchase', (req, res) => {
     var purchase_data = req.body.data;
     purchase_data[1] = Number(purchase_data[1]);
-    console.log(purchase_data);
+    purchase_data = ['moisture? cream', 30000, '1'];
     connection.query('insert into product (name, price, user_id) values (?)', [purchase_data], (error, results) => {
         if (error) {
-           console.log(error);
+           res.send(error);
         }
+        res.send(results);
     });
-    res.send(purchase_data);
 });
+
+var cnt = 'snack';
+app.post('/select', (req, res) => {
+    // var purchase_data = req.body.data;
+    // purchase_data[1] = Number(purchase_data[1]);
+    connectionRO.query('select * from product where name = ?', [cnt], (error, results) => {
+        if (error) {
+           res.send(error);
+        }
+        res.send('done');
+    });
+});
+
+
+app.get('/healthcheck', function(req, res){
+    res.send("it's on");  
+})
 
 app.listen(PORT, () => {
     console.log(`WAS running on ${PORT} port`);
